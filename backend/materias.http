@@ -1,0 +1,40 @@
+### Todas las materias
+GET http://localhost:3000/materias
+
+### Materia por id
+GET http://localhost:3000/materias/4
+
+### Crear una nueva materia
+POST http://localhost:3000/materias
+Content-Type: application/json
+
+{
+    "nombre": "Matemáticas"
+}
+
+### Crear una nueva materia
+POST http://localhost:3000/materias
+Content-Type: application/json
+
+{
+    "nombre": "Historia"
+}
+
+### Crear una nueva materia
+POST http://localhost:3000/materias
+Content-Type: application/json
+
+{
+    "nombre": "Ciencias"
+}
+
+### Eliminar una materia por ID
+DELETE http://localhost:3000/materias/4
+
+### Actualizar una materia por ID
+PUT http://localhost:3000/materias/5
+Content-Type: application/json
+
+{
+    "nombre": "Matemáticas Avanzadas"
+}

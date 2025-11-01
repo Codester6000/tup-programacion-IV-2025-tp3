@@ -1,0 +1,56 @@
+### Listar todos los alumnos
+GET http://localhost:3000/alumnos
+
+### Buscar alumno por ID
+GET http://localhost:3000/alumnos/32
+
+### Registrar un alumno nuevo
+POST http://localhost:3000/alumnos
+Content-Type: application/json
+
+{
+    "nombre": "Ana Gomez",
+    "nota1": 8,
+    "nota2": 7,
+    "nota3": 9,
+    "id_materia": 2
+}
+
+### Registrar otro alumno
+POST http://localhost:3000/alumnos
+Content-Type: application/json
+
+{
+    "nombre": "Marcos Díaz",
+    "nota1": 5,
+    "nota2": 6,
+    "nota3": 7,
+    "id_materia": 1
+}
+
+### Registrar un tercer alumno
+POST http://localhost:3000/alumnos
+Content-Type: application/json
+
+{
+    "nombre": "Lucía Fernández",
+    "nota1": 9,
+    "nota2": 8,
+    "nota3": 10,
+    "id_materia": 3
+}
+
+### Eliminar un alumno por ID
+DELETE http://localhost:3000/alumnos/35
+
+### Modificar un alumno por ID
+PUT http://localhost:3000/alumnos/21
+Content-Type: application/json
+
+{
+    "nombre": "Ana María Torres",
+    "nota1": 9,
+    "nota2": 9,
+    "nota3": 10,
+    "id_materia": 2
+}

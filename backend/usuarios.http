@@ -6,8 +6,8 @@ POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-    "username": "pepe12",
-    "password": "hola1234"
+    "email": "admin@example.com",
+    "password": "Password123"
 }
 
 ###
@@ -29,18 +29,28 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "username": "pepe13",
-    "apellido": "Algo",
-    "nombre":"Jose",
-    "password": "hola1234"
+    "nombre":"Jose Docente",
+    "email": "jose@example.com",
+    "password": "Password456"
 }
 
-### Asignar rol a usuario
-POST {{url}}/usuarios/3/roles
+### Actualizar usuario
+PUT {{url}}/usuarios/2
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "rolId": 5
+    "nombre": "José Docente Actualizado",
+    "activo": true
+}
+
+### Asignar rol a usuario
+POST {{url}}/usuarios/2/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "rolId": 2
 }
 
 ### Quitar rol a usuario

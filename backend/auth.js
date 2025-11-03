@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 import { Strategy, ExtractJwt } from "passport-jwt";
 
-const router = express.Router();
+const app = express.Router();
 
 export function authConfig() {
   // Opciones de configuracion de passport-jwt
@@ -42,9 +42,9 @@ export const verificarAutorizacion = (rol) => {
   };
 };
 
-router.post(
+app.post(
   "/login",
-  body("username").isAlphanumeric("es-ES").isLength({ max: 20 }),
+  body("email").isEmail().withMessage("Debe ser un email válido"),
   body("password").isStrongPassword({
     minLength: 8, // Minimo de 8 caracteres
     minLowercase: 1, // Al menos una letra en minusculas
@@ -54,12 +54,12 @@ router.post(
   }),
   verificarValidaciones,
   async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Consultar por el usuario a la base de datos
     const [usuarios] = await db.execute(
-      "SELECT * FROM usuarios WHERE username=?",
-      [username]
+      "SELECT * FROM usuarios WHERE email=?",
+      [email]
     );
 
     if (usuarios.length === 0) {
@@ -93,17 +93,17 @@ router.post(
     // Generar jwt
     const payload = { userId: usuarios[0].id, roles: rolesUsuario };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "2h",
+      expiresIn: "4h",
     });
 
     // Devolver jwt y otros datos
     res.json({
       success: true,
       token,
-      username: usuarios[0].username,
+      email: usuarios[0].email,
       roles: rolesUsuario,
     });
   }
 );
 
-export default router;
+export default app;

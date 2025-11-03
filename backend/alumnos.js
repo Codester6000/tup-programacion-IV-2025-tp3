@@ -1,117 +1,100 @@
 import express from "express";
 import { db } from "./db.js";
 import {
-    validarAlumno,
-    validarId,
-    verificarValidaciones,
+  validarAlumno,
+  validarId,
+  verificarValidaciones,
 } from "./validaciones.js";
 
-const router = express.Router();
+const app = express.Router();
 
-router.get("/", async (req, res) => {
-    let query =
-        "SELECT a.id_alumno, a.nombre, m.nombre AS materia, a.nota1, a.nota2, a.nota3 FROM alumnos a JOIN materias m ON a.id_materia = m.id_materia";
-    const [rows] = await db.execute(query);
-    console.log("GET /alumnos:", rows);
-    if (rows.length === 0) {
-        return res
-            .status(404)
-            .json({ success: false, message: "No hay alumnos" });
-    }
-    return res.status(200).json({ success: true, data: rows });
+app.get("/", async (req, res) => {
+  const [rows] = await db.execute("SELECT * FROM alumnos");
+  console.log("GET /alumnos:", rows);
+  if (rows.length === 0) {
+    return res.status(404).json({ success: false, message: "No hay alumnos" });
+  }
+  return res.status(200).json({ success: true, data: rows });
 });
 
-router.get("/:id", validarId(), verificarValidaciones, async (req, res) => {
+app.get("/:id", validarId(), verificarValidaciones, async (req, res) => {
+  const { id } = req.params;
+  const [rows] = await db.execute("SELECT * FROM alumnos WHERE id = ?", [id]);
+  console.log(`GET /alumnos/${id}:`, rows);
+  if (rows.length === 0) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Alumno no encontrado" });
+  }
+  return res.status(200).json({ success: true, data: rows[0] });
+});
+
+app.post("/", validarAlumno, verificarValidaciones, async (req, res) => {
+  const { nombre, apellido, dni } = req.body;
+  const [rows] = await db.execute("SELECT * FROM alumnos WHERE dni = ?", [dni]);
+  console.log("POST /alumnos - Duplicado:", rows);
+  if (rows.length > 0) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Ya existe un alumno con ese DNI" });
+  }
+  const [result] = await db.execute(
+    "INSERT INTO alumnos (nombre, apellido, dni) VALUES (?, ?, ?)",
+    [nombre, apellido, dni]
+  );
+  console.log("POST /alumnos - Insert:", result);
+  return res.status(201).json({
+    success: true,
+    data: { id: result.insertId, nombre, apellido, dni },
+  });
+});
+
+app.delete("/:id", validarId(), verificarValidaciones, async (req, res) => {
+  const { id } = req.params;
+  // TODO: Verificar si el alumno tiene notas asociadas antes de borrar
+  const [result] = await db.execute("DELETE FROM alumnos WHERE id = ?", [id]);
+  console.log(`DELETE /alumnos/${id} - Delete:`, result);
+  if (result.affectedRows === 0) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Alumno no encontrado" });
+  }
+  return res.status(200).json({ success: true, data: { id } });
+});
+
+app.put(
+  "/:id",
+  validarId(),
+  validarAlumno,
+  verificarValidaciones,
+  async (req, res) => {
     const { id } = req.params;
-    const [rows] = await db.execute(
-        "SELECT a.id_alumno, a.nombre, m.nombre AS materia, a.nota1, a.nota2, a.nota3 FROM alumnos a JOIN materias m ON a.id_materia = m.id_materia WHERE a.id_alumno = ?",
-        [id]
-    );
-    console.log(`GET /alumnos/${id}:`, rows);
-    if (rows.length === 0) {
-        return res
-            .status(404)
-            .json({ success: false, message: "Alumno no encontrado" });
-    }
-    return res.status(200).json({ success: true, data: rows[0] });
-});
-
-router.post("/", validarAlumno, verificarValidaciones, async (req, res) => {
-    const { nombre, nota1, nota2, nota3, id_materia } = req.body;
-    const [rows] = await db.execute(
-        "SELECT * FROM alumnos WHERE nombre = ? AND id_materia = ?",
-        [nombre, id_materia]
-    );
-    console.log("POST /alumnos - Duplicado:", rows);
-    if (rows.length > 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Ya existe ese alumno en esa materia",
-        });
-    }
-    const [result] = await db.execute(
-        "INSERT INTO alumnos (nombre, nota1, nota2, nota3, id_materia) VALUES (?, ?, ?, ?, ?)",
-        [nombre, nota1, nota2, nota3, id_materia]
-    );
-    console.log("POST /alumnos - Insert:", result);
-    return res.status(201).json({
-        success: true,
-        data: { id: result.insertId, nombre, nota1, nota2, nota3, id_materia },
-    });
-});
-
-router.delete("/:id", validarId(), verificarValidaciones, async (req, res) => {
-    const { id } = req.params;
-    const [rows] = await db.execute(
-        "SELECT * FROM alumnos WHERE id_alumno = ?",
-        [id]
-    );
-    console.log(`DELETE /alumnos/${id} - Buscar:`, rows);
-    if (rows.length === 0) {
-        return res
-            .status(404)
-            .json({ success: false, message: "Alumno no encontrado" });
-    }
-    const [result] = await db.execute("DELETE FROM alumnos WHERE id_alumno = ?", [id]);
-    console.log(`DELETE /alumnos/${id} - Delete:`, result);
-    return res.status(200).json({ success: true, data: { id } });
-});
-
-router.put("/:id", validarId(), validarAlumno, verificarValidaciones, async (req, res) => {
-    const { id } = req.params;
-    const { nombre, nota1, nota2, nota3, id_materia } = req.body;
+    const { nombre, apellido, dni } = req.body;
     const [duplicado] = await db.execute(
-        "SELECT * FROM alumnos WHERE nombre = ? AND id_materia = ? AND id_alumno <> ?",
-        [nombre, id_materia, id]
+      "SELECT * FROM alumnos WHERE dni = ? AND id <> ?",
+      [dni, id]
     );
     console.log(`PUT /alumnos/${id} - Duplicado:`, duplicado);
     if (duplicado.length > 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Ya existe ese alumno en esa materia",
-        });
-    }
-    const [rows] = await db.execute(
-        "SELECT * FROM alumnos WHERE id_alumno = ?",
-        [id]
-    );
-    console.log(`PUT /alumnos/${id} - Buscar:`, rows);
-    if (rows.length === 0) {
-        return res
-            .status(404)
-            .json({ success: false, message: "Alumno no encontrado" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Ya existe otro alumno con ese DNI" });
     }
     const [result] = await db.execute(
-        "UPDATE alumnos SET nombre = ?, nota1 = ?, nota2 = ?, nota3 = ?, id_materia = ? WHERE id_alumno = ?",
-        [nombre, nota1, nota2, nota3, id_materia, id]
+      "UPDATE alumnos SET nombre = ?, apellido = ?, dni = ? WHERE id = ?",
+      [nombre, apellido, dni, id]
     );
     console.log(`PUT /alumnos/${id} - Update:`, result);
-    return res
-        .status(200)
-        .json({
-            success: true,
-            data: { id, nombre, nota1, nota2, nota3, id_materia },
-        });
-});
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Alumno no encontrado" });
+    }
+    return res.status(200).json({
+      success: true,
+      data: { id, nombre, apellido, dni },
+    });
+  }
+);
 
-export default router;
+export default app;

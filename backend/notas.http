@@ -1,0 +1,42 @@
+@url = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+### Listar todas las notas (con datos de alumno y materia)
+GET {{url}}/notas
+Authorization: Bearer {{token}}
+
+### Buscar nota por ID
+GET {{url}}/notas/1
+Authorization: Bearer {{token}}
+
+### Registrar notas para un alumno en una materia
+# Asume que el alumno con ID=1 y la materia con ID=1 existen.
+POST {{url}}/notas
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "alumno_id": 1,
+    "materia_id": 1,
+    "nota1": 8,
+    "nota2": 7,
+    "nota3": 9
+}
+
+### Modificar las notas de un registro por su ID
+# Asume que la nota con ID=1 existe.
+PUT {{url}}/notas/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "alumno_id": 1,
+    "materia_id": 1,
+    "nota1": 9,
+    "nota2": 8,
+    "nota3": 10
+}
+
+### Eliminar un registro de notas por ID
+DELETE {{url}}/notas/1
+Authorization: Bearer {{token}}

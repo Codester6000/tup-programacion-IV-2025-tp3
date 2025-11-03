@@ -1,56 +1,47 @@
+@url = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
 ### Listar todos los alumnos
-GET http://localhost:3000/alumnos
+GET {{url}}/alumnos
+Authorization: Bearer {{token}}
 
 ### Buscar alumno por ID
-GET http://localhost:3000/alumnos/32
+GET {{url}}/alumnos/1
+Authorization: Bearer {{token}}
 
 ### Registrar un alumno nuevo
-POST http://localhost:3000/alumnos
+POST {{url}}/alumnos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "nombre": "Ana Gomez",
-    "nota1": 8,
-    "nota2": 7,
-    "nota3": 9,
-    "id_materia": 2
+    "nombre": "Carlos",
+    "apellido": "Santana",
+    "dni": "30123456"
 }
 
 ### Registrar otro alumno
-POST http://localhost:3000/alumnos
+POST {{url}}/alumnos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "nombre": "Marcos Díaz",
-    "nota1": 5,
-    "nota2": 6,
-    "nota3": 7,
-    "id_materia": 1
-}
-
-### Registrar un tercer alumno
-POST http://localhost:3000/alumnos
-Content-Type: application/json
-
-{
-    "nombre": "Lucía Fernández",
-    "nota1": 9,
-    "nota2": 8,
-    "nota3": 10,
-    "id_materia": 3
+    "nombre": "Laura",
+    "apellido": "Pausini",
+    "dni": "31987654"
 }
 
 ### Eliminar un alumno por ID
-DELETE http://localhost:3000/alumnos/35
+DELETE {{url}}/alumnos/2
+Authorization: Bearer {{token}}
 
 ### Modificar un alumno por ID
-PUT http://localhost:3000/alumnos/21
+PUT {{url}}/alumnos/1
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "nombre": "Ana María Torres",
-    "nota1": 9,
-    "nota2": 9,
-    "nota3": 10,
-    "id_materia": 2
+    "nombre": "Carlos Alberto",
+    "apellido": "Santana",
+    "dni": "30123456"
 }

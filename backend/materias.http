@@ -1,40 +1,36 @@
+@url = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
 ### Todas las materias
-GET http://localhost:3000/materias
+GET {{url}}/materias
+Authorization: Bearer {{token}}
 
 ### Materia por id
-GET http://localhost:3000/materias/4
+GET {{url}}/materias/1
+Authorization: Bearer {{token}}
 
 ### Crear una nueva materia
-POST http://localhost:3000/materias
+POST {{url}}/materias
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "nombre": "Matemáticas"
-}
-
-### Crear una nueva materia
-POST http://localhost:3000/materias
-Content-Type: application/json
-
-{
-    "nombre": "Historia"
-}
-
-### Crear una nueva materia
-POST http://localhost:3000/materias
-Content-Type: application/json
-
-{
-    "nombre": "Ciencias"
+    "nombre": "Laboratorio de Programación IV",
+    "codigo": "LP4",
+    "año": 2025
 }
 
 ### Eliminar una materia por ID
-DELETE http://localhost:3000/materias/4
+DELETE {{url}}/materias/3
+Authorization: Bearer {{token}}
 
 ### Actualizar una materia por ID
-PUT http://localhost:3000/materias/5
+PUT {{url}}/materias/1
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "nombre": "Matemáticas Avanzadas"
+    "nombre": "Laboratorio de Programación IV",
+    "codigo": "LPROG4",
+    "año": 2025
 }

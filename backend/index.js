@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import { conectarDB } from "./db.js";
 import usuariosRouter from "./usuarios.js";
-import rolesRouter from "./roles.js";
-import usuariosRolesRouter from "./usuarios-roles.js";
 import authRouter, { authConfig } from "./auth.js";
+import materiasRouter from "./materias.js";
+import alumnosRouter from "./alumnos.js";
+import notasRouter from "./notas.js";
 
 conectarDB();
 
@@ -25,9 +26,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/usuarios", usuariosRouter);
-app.use("/roles", rolesRouter);
-app.use("/usuarios-roles", usuariosRolesRouter);
 app.use("/auth", authRouter);
+app.use("/materias", materiasRouter);
+app.use("/alumnos", alumnosRouter);
+app.use("/notas", notasRouter);
 
 app.listen(port, () => {
   console.log(`La aplicación esta funcionando en el puerto ${port}`);

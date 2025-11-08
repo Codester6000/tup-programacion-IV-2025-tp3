@@ -4,13 +4,13 @@ import {
   validarId,
   verificarValidaciones,
 } from "./validaciones.js";
-//import { verificarAutenticacion } from "./auth.js";
+import { verificarAutenticacion } from "./auth.js";
 import { body, param } from "express-validator";
 
 const app = express.Router();
 
 // Proteger todas las rutas de este router
-//app.use(verificarAutenticacion);
+app.use(verificarAutenticacion);
 
 // GET /notas - Obtener todas las notas con info de alumno y materia
 app.get("/", async (req, res) => {

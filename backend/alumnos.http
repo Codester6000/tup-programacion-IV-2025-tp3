@@ -1,5 +1,5 @@
 @url = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc2MjU2NzEwNSwiZXhwIjoxNzYyNTgxNTA1fQ.5zim2vpGV0UPTTjJGe-7t-ijDWkxRlLCrQjFCkBpnMs
 
 ### Listar todos los alumnos
 GET {{url}}/alumnos

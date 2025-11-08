@@ -1,13 +1,13 @@
 import express from "express";
 import { db } from "./db.js";
-//import { verificarAutenticacion } from "./auth.js";
+import { verificarAutenticacion } from "./auth.js";
 import { body, param } from "express-validator";
 import { verificarValidaciones } from "./validaciones.js";
 
 const app = express.Router();
 
 // Proteger todas las rutas de este router
-//app.use(verificarAutenticacion);
+app.use(verificarAutenticacion);
 
 // GET /alumnos - Obtener todos los alumnos
 app.get("/", async (req, res) => {

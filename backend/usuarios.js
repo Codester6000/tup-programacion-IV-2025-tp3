@@ -7,23 +7,22 @@ import { verificarAutenticacion } from "./auth.js";
 
 const app = express.Router();
 
-app.get("/", verificarAutenticacion, async (req, res) => {
+app.get("/", verificarAutenticacion, 
+  async (req, res) => {
   const [rows] = await db.execute("SELECT * FROM usuarios");
-  // RECORDAR Quitar la contraseña en la api
+  
   res.json({
     success: true,
     usuarios: rows.map((u) => ({ ...u, password_hash: undefined })),
   });
 });
 
-app.get(
-  "/:id",
-  //Aqui si se autentica
+app.get("/:id",
+  
   verificarAutenticacion,
   validarId,
   verificarValidaciones,
-  //Aqui no se autentica
-  //verificarAutenticacion,
+  
   async (req, res) => {
     const id = Number(req.params.id);
     const [rows] = await db.execute(
@@ -74,7 +73,7 @@ app.post(
 
 app.put(
   "/:id",
-  verificarAutenticacion,  
+  //verificarAutenticacion,  
   validarId,
   body("nombre").isString().isLength({ min: 2, max: 50 }).optional(),
   body("password")
@@ -118,7 +117,8 @@ app.put(
   }
 );
 
-app.delete("/:id", verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
+app.delete("/:id", verificarAutenticacion  , 
+  validarId, verificarValidaciones, async (req, res) => {
   const id = Number(req.params.id);
   const [result] = await db.execute("DELETE FROM usuarios WHERE id=?", [id]);
   if (result.affectedRows === 0) {

@@ -3,7 +3,7 @@ import { db } from "./db.js";
 import { validarId, verificarValidaciones } from "./validaciones.js";
 import { body, param } from "express-validator";
 import bcrypt from "bcrypt";
-import { verificarAutenticacion, verificarAutorizacion } from "./auth.js";
+import { verificarAutenticacion } from "./auth.js";
 
 const app = express.Router();
 
@@ -27,7 +27,7 @@ app.get(
   async (req, res) => {
     const id = Number(req.params.id);
     const [rows] = await db.execute(
-      "SELECT id, nombre, email, activo FROM usuarios WHERE id=?",
+      "SELECT id, nombre, email FROM usuarios WHERE id=?",
       [id]
     );
 
@@ -43,8 +43,7 @@ app.get(
 
 app.post(
   "/",
-  verificarAutenticacion,
-  verificarAutorizacion("admin"),
+  verificarAutenticacion,  
   body("nombre").isString().isLength({ min: 2, max: 50 }),
   body("email").isEmail(),
   body("password").isStrongPassword({
@@ -75,16 +74,20 @@ app.post(
 
 app.put(
   "/:id",
-  verificarAutenticacion,
-  verificarAutorizacion("admin"),
+  verificarAutenticacion,  
   validarId,
   body("nombre").isString().isLength({ min: 2, max: 50 }).optional(),
-  body("email").isEmail().optional(),
-  body("activo").isBoolean().optional(),
+  body("password")
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minNumbers: 1,
+    })
+    .optional(),  
   verificarValidaciones,
   async (req, res) => {
     const id = Number(req.params.id);
-    const { nombre, email, activo } = req.body;
+    const { nombre, password } = req.body;
 
     const [rows] = await db.execute("SELECT * FROM usuarios WHERE id=?", [id]);
     if (rows.length === 0) {
@@ -94,22 +97,28 @@ app.put(
     }
 
     const u = rows[0];
-    const updatedUser = {
-      nombre: nombre || u.nombre,
-      email: email || u.email,
-      activo: activo !== undefined ? activo : u.activo,
-    };
+    // Mantener los valores existentes si no se proporcionan nuevos
+    const nuevoNombre = nombre || u.nombre;
 
-    await db.execute(
-      "UPDATE usuarios SET nombre=?, email=?, activo=? WHERE id=?",
-      [updatedUser.nombre, updatedUser.email, id]
-    );
+    let sql = "UPDATE usuarios SET nombre=? ";
+    const params = [nuevoNombre];
 
-    res.json({ success: true, data: { id, ...updatedUser } });
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      sql += ", password_hash=? ";
+      params.push(hashedPassword);
+    }
+
+    sql += "WHERE id=?";
+    params.push(id);
+
+    await db.execute(sql, params);
+
+    res.json({ success: true });
   }
 );
 
-app.delete("/:id", verificarAutenticacion, verificarAutorizacion("admin"), validarId, verificarValidaciones, async (req, res) => {
+app.delete("/:id", verificarAutenticacion, validarId, verificarValidaciones, async (req, res) => {
   const id = Number(req.params.id);
   const [result] = await db.execute("DELETE FROM usuarios WHERE id=?", [id]);
   if (result.affectedRows === 0) {
@@ -117,71 +126,5 @@ app.delete("/:id", verificarAutenticacion, verificarAutorizacion("admin"), valid
   }
   res.json({ success: true });
 });
-
-// Consultar por roles de usuario
-app.get(
-  "/:id/roles",
-  verificarAutenticacion,
-  validarId,
-  verificarValidaciones,
-  async (req, res) => {
-    const id = Number(req.params.id);
-
-    // Verificar que exista usuario
-
-    let sql =
-      "SELECT r.id, r.nombre \
-       FROM roles r \
-       JOIN usuarios_roles ur ON r.id = ur.rol_id \
-       WHERE ur.usuario_id = ? \
-       ORDER BY r.nombre";
-
-    const [rows] = await db.execute(sql, [id]);
-    res.json({ success: true, data: rows });
-  }
-);
-
-// Asignar un rol a un usuario
-app.post(
-  "/:id/roles",
-  verificarAutenticacion,
-  verificarAutorizacion("admin"),
-  validarId,
-  body("rolId").isInt({ min: 1 }),
-  verificarValidaciones,
-  async (req, res) => {
-    const usuarioId = Number(req.params.id);
-    const rolId = req.body.rolId;
-
-    // Verificar que exista usuario
-    // Verificar que exista rol
-
-    let sql = "INSERT INTO usuarios_roles (usuario_id, rol_id) VALUES (?,?)";
-
-    await db.execute(sql, [usuarioId, rolId]);
-
-    res.json({ success: true });
-  }
-);
-
-// Quitar un rol a un usuario
-app.delete(
-  "/:id/roles/:rolId",
-  verificarAutenticacion,
-  verificarAutorizacion("admin"),
-  validarId,
-  param("rolId").isInt({ min: 1 }),
-  verificarValidaciones,
-  async (req, res) => {
-    const usuarioId = Number(req.params.id);
-    const rolId = Number(req.params.rolId);
-
-    let sql = "DELETE FROM usuarios_roles WHERE usuario_id=? AND rol_id=?";
-
-    await db.execute(sql, [usuarioId, rolId]);
-
-    res.json({ success: true });
-  }
-);
 
 export default app;

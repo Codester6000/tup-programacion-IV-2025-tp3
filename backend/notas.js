@@ -1,19 +1,23 @@
 import express from "express";
 import { db } from "./db.js";
 import {
-  validarNota,
   validarId,
   verificarValidaciones,
 } from "./validaciones.js";
+//import { verificarAutenticacion } from "./auth.js";
+import { body, param } from "express-validator";
 
 const app = express.Router();
+
+// Proteger todas las rutas de este router
+//app.use(verificarAutenticacion);
 
 // GET /notas - Obtener todas las notas con info de alumno y materia
 app.get("/", async (req, res) => {
   const [rows] = await db.execute(`
     SELECT 
       n.id, n.nota1, n.nota2, n.nota3,
-      (n.nota1 + n.nota2 + n.nota3) / 3 AS promedio,
+      TRUNCATE((n.nota1 + n.nota2 + n.nota3) / 3, 2) AS promedio,
       a.id as alumno_id, a.nombre as alumno_nombre, a.apellido as alumno_apellido,
       m.id_materia as materia_id, m.nombre as materia_nombre
     FROM notas n
@@ -28,7 +32,7 @@ app.get("/", async (req, res) => {
 });
 
 // GET /notas/:id - Obtener una nota por su ID
-app.get("/:id", validarId(), verificarValidaciones, async (req, res) => {
+app.get("/:id", param("id").isInt({min: 1}), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [rows] = await db.execute("SELECT * FROM notas WHERE id = ?", [id]);
   if (rows.length === 0) {
@@ -40,7 +44,14 @@ app.get("/:id", validarId(), verificarValidaciones, async (req, res) => {
 });
 
 // POST /notas - Crear una nueva nota
-app.post("/", validarNota, verificarValidaciones, async (req, res) => {
+app.post("/",
+  body("alumno_id").isInt({ min: 1 }),
+  body("materia_id").isInt({ min: 1 }),
+  body("nota1").isDecimal().optional({ nullable: true }),
+  body("nota2").isDecimal().optional({ nullable: true }),
+  body("nota3").isDecimal().optional({ nullable: true }),
+  verificarValidaciones,
+  async (req, res) => {
   const { alumno_id, materia_id, nota1, nota2, nota3 } = req.body;
 
   // Verificar que no exista ya una nota para ese alumno en esa materia
@@ -69,16 +80,18 @@ app.post("/", validarNota, verificarValidaciones, async (req, res) => {
 // PUT /notas/:id - Actualizar una nota
 app.put(
   "/:id",
-  validarId(),
-  validarNota,
+  param("id").isInt({ min: 1 }),
+  body("nota1").isDecimal().optional({ nullable: true }),
+  body("nota2").isDecimal().optional({ nullable: true }),
+  body("nota3").isDecimal().optional({ nullable: true }),
   verificarValidaciones,
   async (req, res) => {
     const { id } = req.params;
     const { alumno_id, materia_id, nota1, nota2, nota3 } = req.body;
 
     const [result] = await db.execute(
-      "UPDATE notas SET alumno_id = ?, materia_id = ?, nota1 = ?, nota2 = ?, nota3 = ? WHERE id = ?",
-      [alumno_id, materia_id, nota1, nota2, nota3, id]
+      "UPDATE notas SET nota1 = ?, nota2 = ?, nota3 = ? WHERE id = ?",
+      [nota1, nota2, nota3, id]
     );
 
     if (result.affectedRows === 0) {
@@ -92,7 +105,7 @@ app.put(
 );
 
 // DELETE /notas/:id - Eliminar una nota
-app.delete("/:id", validarId(), verificarValidaciones, async (req, res) => {
+app.delete("/:id", param("id").isInt({min: 1}), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [result] = await db.execute("DELETE FROM notas WHERE id = ?", [id]);
   if (result.affectedRows === 0) {

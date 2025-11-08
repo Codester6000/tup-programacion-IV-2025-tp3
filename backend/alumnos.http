@@ -17,7 +17,7 @@ Authorization: Bearer {{token}}
 {
     "nombre": "Carlos",
     "apellido": "Santana",
-    "dni": "30123456"
+    "dni": "30123455"
 }
 
 ### Registrar otro alumno
@@ -32,7 +32,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Eliminar un alumno por ID
-DELETE {{url}}/alumnos/2
+DELETE {{url}}/alumnos/6
 Authorization: Bearer {{token}}
 
 ### Modificar un alumno por ID
@@ -41,7 +41,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "nombre": "Carlos Alberto",
+    "nombre": "carlos Alberto",
     "apellido": "Santana",
     "dni": "30123456"
 }

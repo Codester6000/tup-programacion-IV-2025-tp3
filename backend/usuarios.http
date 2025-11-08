@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "email": "admin@example.com",
-    "password": "Password123"
+    "password": "Password@123"
 }
 
 ###
@@ -20,8 +20,7 @@ Authorization: Bearer {{token}}
 ### Consultar por un usuario
 GET {{url}}/usuarios/1
 
-### Consultar por roles de usuario
-GET {{url}}/usuarios/3/roles
+
 
 ### Crear usuario
 POST {{url}}/usuarios
@@ -41,17 +40,7 @@ Content-Type: application/json
 
 {
     "nombre": "José Docente Actualizado",
-    "activo": true
+    
 }
 
-### Asignar rol a usuario
-POST {{url}}/usuarios/2/roles
-Authorization: Bearer {{token}}
-Content-Type: application/json
 
-{
-    "rolId": 2
-}
-
-### Quitar rol a usuario
-DELETE {{url}}/usuarios/3/roles/5

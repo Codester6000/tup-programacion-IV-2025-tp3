@@ -10,7 +10,7 @@ GET {{url}}/notas/1
 Authorization: Bearer {{token}}
 
 ### Registrar notas para un alumno en una materia
-# Asume que el alumno con ID=1 y la materia con ID=1 existen.
+
 POST {{url}}/notas
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -24,7 +24,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Modificar las notas de un registro por su ID
-# Asume que la nota con ID=1 existe.
+
 PUT {{url}}/notas/1
 Content-Type: application/json
 Authorization: Bearer {{token}}

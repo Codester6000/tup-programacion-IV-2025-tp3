@@ -42,7 +42,7 @@ app.get("/:id",
 
 app.post(
   "/",
-  verificarAutenticacion,  
+  //verificarAutenticacion,  // Se quita la autenticación para permitir el registro público
   body("nombre").isString().isLength({ min: 2, max: 50 }),
   body("email").isEmail(),
   body("password").isStrongPassword({
@@ -59,10 +59,7 @@ app.post(
     // Creamos Hash de la contraseña con bcrypt
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const [result] = await db.execute(
-      "INSERT INTO usuarios (nombre, email, password_hash) VALUES (?,?,?)",
-      [nombre, email, hashedPassword]
-    );
+    const [result] = await db.execute( "INSERT INTO usuarios (nombre, email, password_hash) VALUES (?, ?, ?)", [nombre, email, hashedPassword] );
 
     res.status(201).json({
       success: true,
@@ -75,6 +72,7 @@ app.put(
   "/:id",
   //verificarAutenticacion,  
   validarId,
+
   body("nombre").isString().isLength({ min: 2, max: 50 }).optional(),
   body("password")
     .isStrongPassword({

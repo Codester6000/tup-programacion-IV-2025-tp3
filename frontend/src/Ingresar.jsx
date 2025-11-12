@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { useAuth } from "./Auth";
+import { Link } from "react-router-dom";
 
 export const Ingresar = () => {
   const { error, login } = useAuth();
 
   const [open, setOpen] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    login(username, password);
+    login(email, password);
     /*
-    const result = await login(username, password);
+    const result = await login(email, password);
     if (result.success) {
       setOpen(false);
     }
@@ -27,11 +28,11 @@ export const Ingresar = () => {
           <h2>Ingrese usuario y contraseña</h2>
           <form onSubmit={handleSubmit}>
             <fieldset>
-              <label htmlFor="username">Usuario:</label>
+              <label htmlFor="email">Email:</label>
               <input
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <label htmlFor="password">Contraseña:</label>
               <input
@@ -51,6 +52,9 @@ export const Ingresar = () => {
                   onClick={() => setOpen(false)}
                 />
                 <input type="submit" value="Ingresar" />
+                <Link to="/usuarios/crear" role="button" className="contrast" onClick={() => setOpen(false)}>
+                  Registrarse
+                </Link>
               </div>
             </footer>
           </form>

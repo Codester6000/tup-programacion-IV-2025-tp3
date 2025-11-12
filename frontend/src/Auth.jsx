@@ -4,6 +4,7 @@ import { createContext, useContext, useState } from "react";
 const AuthContext = createContext(null);
 
 // Hook personzalizado para acceder al contexto de auth
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -11,7 +12,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
-  const [roles, setRoles] = useState(null);
   const [error, setError] = useState(null);
 
   const login = async (username, password) => {
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email: username, password }),
       });
 
       const session = await response.json();
@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
 
       setToken(session.token);
       setUsername(session.username);
-      setRoles(session.roles);
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setToken(null);
     setUsername(null);
-    setRoles(null);
     setError(null);
   };
 
@@ -59,9 +57,28 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, username, roles, error, login, logout, fetchAuth }}
+      value={{
+        token,
+        username,
+        error,
+        isAuthenticated: !!token,
+        login,
+        logout,
+        fetchAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Muestra un mensaje si el usuario no esta logeado
+export const AuthPage = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <h2>Ingrese para ver esta pagina</h2>;
+  }
+
+  return children;
 };

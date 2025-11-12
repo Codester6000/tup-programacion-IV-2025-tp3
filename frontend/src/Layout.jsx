@@ -1,26 +1,29 @@
-import { Outlet, Link } from "react-router";
+import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "./Auth";
 import { Ingresar } from "./Ingresar";
 
 export const Layout = () => {
-  const { username, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <main className="container">
       <nav>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/alumnos">Alumnos</Link>
+          </li>
+          <li>
+            <Link to="/materias">Materias</Link>
+          </li>
+          <li>
+            <Link to="/">Notas</Link>
           </li>
           <li>
             <Link to="/usuarios">Usuarios</Link>
           </li>
-          <li>
-            <Link to="/roles">Roles</Link>
-          </li>
         </ul>
         <li>
-          {username ? (
+          {isAuthenticated ? (
             <button onClick={() => logout()}>Salir</button>
           ) : (
             <Ingresar />

@@ -1,10 +1,7 @@
 import { createContext, useContext, useState } from "react";
 
-// Contexto para compartir el estado de autenticacion/autorizacion
 const AuthContext = createContext(null);
 
-// Hook personzalizado para acceder al contexto de auth
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -26,14 +23,14 @@ export const AuthProvider = ({ children }) => {
       const session = await response.json();
 
       if (!response.ok && response.status === 400) {
-        throw new Error(session.error);
+        throw new Error("Usuario o contraseña inválida");
       }
 
       setToken(session.token);
-      setUsername(session.username);
+      setUsername(session.email);
       return { success: true };
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Usuario o contraseña inválida");
       return { success: false };
     }
   };
@@ -72,7 +69,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Muestra un mensaje si el usuario no esta logeado
 export const AuthPage = ({ children }) => {
   const { isAuthenticated } = useAuth();
 

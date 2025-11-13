@@ -34,13 +34,11 @@ export function Usuarios() {
   );
 
   useEffect(() => {
-    fetchUsuarios();
-  }, [fetchUsuarios]);
+    fetchUsuarios(buscar);
+  }, [fetchUsuarios, buscar]);
 
   const handleQuitar = async (id) => {
-    // Preguntar si quiere quitar el usuario
     if (window.confirm("¿Desea quitar el usuario?")) {
-      // Pedir a la api que quite el usuario
       const response = await fetchAuth(`http://localhost:3000/usuarios/${id}`, {
         method: "DELETE",
       });
@@ -50,7 +48,7 @@ export function Usuarios() {
         return window.alert("Error al quitar usuario");
       }
 
-      await fetchUsuarios();
+      await fetchUsuarios(buscar);
     }
   };
 
@@ -61,7 +59,7 @@ export function Usuarios() {
         Nuevo usuario
       </Link>
       <div className="group">
-        <input value={buscar} onChange={(e) => setBuscar(e.target.value)} />
+        <input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar por nombre o email..." />
         <button onClick={() => fetchUsuarios(buscar)}>Buscar</button>
       </div>
       <table>
@@ -69,6 +67,7 @@ export function Usuarios() {
           <tr>
             <th>ID</th>
             <th>Nombre</th>
+            <th>Email</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -77,6 +76,7 @@ export function Usuarios() {
             <tr key={u.id}>
               <td>{u.id}</td>
               <td>{u.nombre}</td>
+              <td>{u.email}</td>
               <td>
                 <div>
                   <Link role="button" to={`/usuarios/${u.id}/modificar`}>

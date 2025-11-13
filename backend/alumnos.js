@@ -6,16 +6,33 @@ import { verificarValidaciones } from "./validaciones.js";
 
 const app = express.Router();
 
-// Proteger todas las rutas de este router
 app.use(verificarAutenticacion);
 
-// GET /alumnos - Obtener todos los alumnos
 app.get("/", async (req, res) => {
-  const [rows] = await db.execute("SELECT * FROM alumnos ORDER BY apellido, nombre");
+  const { buscar } = req.query;
+
+  let sql = "SELECT * FROM alumnos";
+  const params = [];
+
+  if (buscar) {
+    const idBusqueda = parseInt(buscar, 10);
+    const esNumerico = !isNaN(idBusqueda) && String(idBusqueda) === buscar;
+
+    if (esNumerico) {
+      sql += " WHERE nombre LIKE ? OR apellido LIKE ? OR dni LIKE ? OR id = ?";
+      params.push(`%${buscar}%`, `%${buscar}%`, `%${buscar}%`, idBusqueda);
+    } else {
+      sql += " WHERE nombre LIKE ? OR apellido LIKE ? OR dni LIKE ?";
+      params.push(`%${buscar}%`, `%${buscar}%`, `%${buscar}%`);
+    }
+  }
+
+  sql += " ORDER BY apellido, nombre";
+
+  const [rows] = await db.execute(sql, params);
   res.json({ success: true, data: rows });
 });
 
-// GET /alumnos/:id - Obtener un alumno por su ID
 app.get(
   "/:id",
   param("id").isInt({ min: 1 }),
@@ -32,7 +49,6 @@ app.get(
   }
 );
 
-// POST /alumnos - Crear un nuevo alumno
 app.post(
   "/",
   body("nombre").isString().notEmpty(),
@@ -60,7 +76,6 @@ app.post(
   }
 );
 
-// PUT /alumnos/:id - Actualizar un alumno
 app.put(
   "/:id",
   param("id").isInt({ min: 1 }),
@@ -84,7 +99,6 @@ app.put(
   }
 );
 
-// DELETE /alumnos/:id - Eliminar un alumno
 app.delete("/:id", param("id").isInt({ min: 1 }), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [result] = await db.execute("DELETE FROM alumnos WHERE id = ?", [id]);

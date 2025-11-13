@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import passport from "passport";
 import { Strategy, ExtractJwt } from "passport-jwt";
 
+
 const app = express.Router();
 
 export function authConfig() {

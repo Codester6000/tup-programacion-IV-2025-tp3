@@ -22,7 +22,7 @@ export const CrearUsuario = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nombre: values.nombre,
-        email: values.username, // Renombrar username a email
+        email: values.username,
         password: values.password,
       }),
     });
@@ -44,8 +44,9 @@ export const CrearUsuario = () => {
       <form onSubmit={handleSubmit}>
         <fieldset>
           <label>
-            Nombre de usuario
+            Email
             <input
+              type="email"
               required
               value={values.username}
               onChange={(e) =>
@@ -104,6 +105,9 @@ export const CrearUsuario = () => {
                   .join(", ")}
               </small>
             )}
+            <small>
+              Debe tener al menos 8 caracteres, una letra y un número.
+            </small>
           </label>
         </fieldset>
         <input type="submit" value="Crear usuario" />

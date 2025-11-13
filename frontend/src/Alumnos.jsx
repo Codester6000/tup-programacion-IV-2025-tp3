@@ -6,6 +6,7 @@ export function Alumnos() {
   const { fetchAuth } = useAuth();
   const [alumnos, setAlumnos] = useState([]);
   const [buscar, setBuscar] = useState("");
+  const [mostrarAlumnos, setMostrarAlumnos] = useState(true);
 
   const fetchAlumnos = useCallback(
     async (query) => {
@@ -29,8 +30,8 @@ export function Alumnos() {
   );
 
   useEffect(() => {
-    fetchAlumnos();
-  }, [fetchAlumnos]);
+    fetchAlumnos(buscar);
+  }, [fetchAlumnos, buscar]);
 
   const handleQuitar = async (id) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este alumno?")) {
@@ -53,39 +54,43 @@ export function Alumnos() {
       <Link role="button" to="/alumnos/crear">
         Nuevo Alumno
       </Link>
-      <div className="group">
-        <input
-          value={buscar}
-          onChange={(e) => setBuscar(e.target.value)}
-          placeholder="Buscar por nombre, apellido o DNI"
-        />
-        <button onClick={() => fetchAlumnos(buscar)}>Buscar</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DNI</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {alumnos.map((a) => (
-            <tr key={a.id}>
-              <td>{a.id}</td>
-              <td>{a.nombre}</td>
-              <td>{a.apellido}</td>
-              <td>{a.dni}</td>
-              <td>
-                <Link role="button" to={`/alumnos/${a.id}/modificar`}>Modificar</Link>
-                <button className="secondary" onClick={() => handleQuitar(a.id)}>Quitar</button>
-              </td>
+      <input
+        value={buscar}
+        onChange={(e) => setBuscar(e.target.value)}
+        placeholder="Buscar por nombre, apellido o DNI..."
+        style={{ marginTop: '1rem' }}
+      />
+      <button onClick={() => setMostrarAlumnos(!mostrarAlumnos)} className="contrast" style={{ marginBottom: '1rem' }}>
+        {mostrarAlumnos ? "Ocultar Lista" : "Mostrar Lista"}
+      </button>
+
+      {mostrarAlumnos && (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>DNI</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {alumnos.map((a) => (
+              <tr key={a.id}>
+                <td>{a.id}</td>
+                <td>{a.nombre}</td>
+                <td>{a.apellido}</td>
+                <td>{a.dni}</td>
+                <td>
+                  <Link role="button" to={`/alumnos/${a.id}/modificar`}>Modificar</Link>
+                  <button className="secondary" onClick={() => handleQuitar(a.id)}>Quitar</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </article>
   );
 }

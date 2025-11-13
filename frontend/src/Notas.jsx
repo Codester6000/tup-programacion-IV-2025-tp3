@@ -7,6 +7,9 @@ export function Notas() {
   const [alumnos, setAlumnos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [editingNota, setEditingNota] = useState(null); // Para el modal de edición
+  const [buscarAlumno, setBuscarAlumno] = useState("");
+  const [buscarMateria, setBuscarMateria] = useState("");
+  const [mostrarNotas, setMostrarNotas] = useState(true);
 
   const [newNota, setNewNota] = useState({
     alumno_id: "",
@@ -16,14 +19,21 @@ export function Notas() {
     nota3: "",
   });
 
-  const cargarNotas = useCallback(async () => {
+  const cargarNotas = useCallback(async (alumno, materia) => {
     try {
-      const response = await fetchAuth("http://localhost:3000/notas");
+      const searchParams = new URLSearchParams();
+      if (alumno) {
+        searchParams.append("buscarAlumno", alumno);
+      }
+      if (materia) {
+        searchParams.append("buscarMateria", materia);
+      }
+
+      const response = await fetchAuth(`http://localhost:3000/notas?${searchParams.toString()}`);
       const data = await response.json();
       if (data.success) {
         setNotas(data.data);
       } else if (response.status !== 404) {
-        // No mostrar error si simplemente no hay notas
         console.error("Error al cargar las notas:", data.message);
         setNotas([]);
       }
@@ -57,11 +67,13 @@ export function Notas() {
   }, [fetchAuth]);
 
   useEffect(() => {
-    cargarNotas();
     cargarAlumnos();
     cargarMaterias();
-  }, [cargarNotas, cargarAlumnos, cargarMaterias]);
+  }, [cargarAlumnos, cargarMaterias]);
 
+  useEffect(() => {
+    cargarNotas(buscarAlumno, buscarMateria);
+  }, [buscarAlumno, buscarMateria, cargarNotas]);
   const handleCrearNota = async (e) => {
     e.preventDefault();
     try {
@@ -175,58 +187,80 @@ export function Notas() {
         <button type="submit">Agregar Nota</button>
       </form>
 
-      {/* Tabla de notas */}
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Alumno</th>
-            <th>Materia</th>
-            <th>Nota 1</th>
-            <th>Nota 2</th>
-            <th>Nota 3</th>
-            <th>Promedio</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {notas.map((nota) => (
-            <tr key={nota.id}>
-              <td>{nota.id}</td>
-              <td>{`${nota.alumno_nombre} ${nota.alumno_apellido}`}</td>
-              <td>{nota.materia_nombre}</td>
-              <td>{nota.nota1 ?? "-"}</td>
-              <td>{nota.nota2 ?? "-"}</td>
-              <td>{nota.nota3 ?? "-"}</td>
-              <td>{nota.promedio ?? "-"}</td>
-              <td>
-                <button onClick={() => setEditingNota(nota)}>Editar</button>
-                <button className="secondary" onClick={() => handleEliminarNota(nota.id)}>Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <button onClick={() => setMostrarNotas(!mostrarNotas)} className="contrast" style={{ marginTop: '1rem' }}>
+        {mostrarNotas ? "Ocultar Lista de Notas" : "Mostrar Lista de Notas"}
+      </button>
 
-      {/* Modal para editar */}
-      {editingNota && (
-        <dialog open>
-          <article>
-            <h3>Editar Nota</h3>
-            <form onSubmit={handleEditarNota}>
-              <label>Nota 1</label>
-              <input type="number" step="0.01" value={editingNota.nota1 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota1: e.target.value })} />
-              <label>Nota 2</label>
-              <input type="number" step="0.01" value={editingNota.nota2 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota2: e.target.value })} />
-              <label>Nota 3</label>
-              <input type="number" step="0.01" value={editingNota.nota3 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota3: e.target.value })} />
-              <footer>
-                <button type="button" className="secondary" onClick={() => setEditingNota(null)}>Cancelar</button>
-                <button type="submit">Guardar Cambios</button>
-              </footer>
-            </form>
-          </article>
-        </dialog>
+      {mostrarNotas && (
+        <>
+          <hr />
+
+          <h3>Buscar Notas</h3>
+          <div className="grid">
+            <input
+              value={buscarAlumno}
+              onChange={(e) => setBuscarAlumno(e.target.value)}
+              placeholder="Buscar por alumno..."
+            />
+            <input
+              value={buscarMateria}
+              onChange={(e) => setBuscarMateria(e.target.value)}
+              placeholder="Buscar por materia..."
+            />
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Alumno</th>
+                <th>Materia</th>
+                <th>Nota 1</th>
+                <th>Nota 2</th>
+                <th>Nota 3</th>
+                <th>Promedio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {notas.map((nota) => (
+                <tr key={nota.id}>
+                  <td>{nota.id}</td>
+                  <td>{`${nota.alumno_nombre} ${nota.alumno_apellido}`}</td>
+                  <td>{nota.materia_nombre}</td>
+                  <td>{nota.nota1 ?? "-"}</td>
+                  <td>{nota.nota2 ?? "-"}</td>
+                  <td>{nota.nota3 ?? "-"}</td>
+                  <td>{nota.promedio ?? "-"}</td>
+                  <td>
+                    <button onClick={() => setEditingNota(nota)}>Editar</button>
+                    <button className="secondary" onClick={() => handleEliminarNota(nota.id)}>Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {editingNota && (
+            <dialog open>
+              <article>
+                <h3>Editar Nota</h3>
+                <form onSubmit={handleEditarNota}>
+                  <label>Nota 1</label>
+                  <input type="number" step="0.01" value={editingNota.nota1 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota1: e.target.value })} />
+                  <label>Nota 2</label>
+                  <input type="number" step="0.01" value={editingNota.nota2 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota2: e.target.value })} />
+                  <label>Nota 3</label>
+                  <input type="number" step="0.01" value={editingNota.nota3 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota3: e.target.value })} />
+                  <footer>
+                    <button type="button" className="secondary" onClick={() => setEditingNota(null)}>Cancelar</button>
+                    <button type="submit">Guardar Cambios</button>
+                  </footer>
+                </form>
+              </article>
+            </dialog>
+          )}
+        </>
       )}
     </article>
   );

@@ -44,4 +44,7 @@ Content-Type: application/json
     
 }
 
+### Eliminar usuario
+DELETE {{url}}/usuarios/2
+Authorization: Bearer {{token}}
 

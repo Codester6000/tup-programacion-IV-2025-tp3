@@ -6,16 +6,25 @@ import { verificarValidaciones } from "./validaciones.js";
 
 const app = express.Router();
 
-// Proteger todas las rutas de este router
 app.use(verificarAutenticacion);
 
-// GET /materias - Obtener todas las materias
 app.get("/", async (req, res) => {
-  const [rows] = await db.execute("SELECT * FROM materias ORDER BY año, nombre");
+  const { buscar } = req.query;
+
+  let sql = "SELECT * FROM materias";
+  const params = [];
+
+  if (buscar) {
+    sql += " WHERE nombre LIKE ? OR codigo LIKE ?";
+    params.push(`%${buscar}%`, `%${buscar}%`);
+  }
+
+  sql += " ORDER BY año, nombre";
+
+  const [rows] = await db.execute(sql, params);
   res.json({ success: true, data: rows });
 });
 
-// GET /materias/:id - Obtener una materia por su ID
 app.get(
   "/:id",
   param("id").isInt({ min: 1 }),
@@ -32,7 +41,6 @@ app.get(
   }
 );
 
-// POST /materias - Crear una nueva materia
 app.post(
   "/",
   body("nombre").isString().notEmpty(),
@@ -60,7 +68,6 @@ app.post(
   }
 );
 
-// PUT /materias/:id - Actualizar una materia
 app.put(
   "/:id",
   param("id").isInt({ min: 1 }),
@@ -84,7 +91,6 @@ app.put(
   }
 );
 
-// DELETE /materias/:id - Eliminar una materia
 app.delete("/:id", param("id").isInt({ min: 1 }), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [result] = await db.execute("DELETE FROM materias WHERE id_materia = ?", [id]);

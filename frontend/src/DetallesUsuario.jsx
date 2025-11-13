@@ -8,7 +8,6 @@ export const DetallesUsuario = () => {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
 
-  // Consultar a la API detalles del usuario
   const fetchUsuario = useCallback(async () => {
     const response = await fetchAuth(`http://localhost:3000/usuarios/${id}`);
     const data = await response.json();
@@ -35,7 +34,6 @@ export const DetallesUsuario = () => {
         return window.alert("Error al quitar usuario");
       }
 
-      // Navegar de vuelta a la lista de usuarios
       navigate("/usuarios");
     }
   };
@@ -52,6 +50,9 @@ export const DetallesUsuario = () => {
       </p>
       <p>
         Nombre: <b>{usuario.nombre}</b>
+      </p>
+      <p>
+        Email: <b>{usuario.email}</b>
       </p>
       <div className="grid">
         <Link role="button" to={`/usuarios/${id}/modificar`}>

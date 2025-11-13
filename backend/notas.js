@@ -9,12 +9,12 @@ import { body, param } from "express-validator";
 
 const app = express.Router();
 
-// Proteger todas las rutas de este router
 app.use(verificarAutenticacion);
 
-// GET /notas - Obtener todas las notas con info de alumno y materia
 app.get("/", async (req, res) => {
-  const [rows] = await db.execute(`
+  const { buscarAlumno, buscarMateria } = req.query;
+
+  let sql = `
     SELECT 
       n.id, n.nota1, n.nota2, n.nota3,
       TRUNCATE((n.nota1 + n.nota2 + n.nota3) / 3, 2) AS promedio,
@@ -22,8 +22,25 @@ app.get("/", async (req, res) => {
       m.id_materia as materia_id, m.nombre as materia_nombre
     FROM notas n
     JOIN alumnos a ON n.alumno_id = a.id
-    JOIN materias m ON n.materia_id = m.id_materia
-  `);
+    JOIN materias m ON n.materia_id = m.id_materia`;
+
+  const whereClauses = [];
+  const params = [];
+
+  if (buscarAlumno) {
+    whereClauses.push(`(a.nombre LIKE ? OR a.apellido LIKE ?)`);
+    params.push(`%${buscarAlumno}%`, `%${buscarAlumno}%`);
+  }
+  if (buscarMateria) {
+    whereClauses.push(`m.nombre LIKE ?`);
+    params.push(`%${buscarMateria}%`);
+  }
+
+  if (whereClauses.length > 0) {
+    sql += ` WHERE ${whereClauses.join(" AND ")}`;
+  }
+
+  const [rows] = await db.execute(sql, params);
 
   if (rows.length === 0) {
     return res.status(404).json({ success: false, message: "No hay notas" });
@@ -31,7 +48,6 @@ app.get("/", async (req, res) => {
   res.json({ success: true, data: rows });
 });
 
-// GET /notas/:id - Obtener una nota por su ID
 app.get("/:id", param("id").isInt({min: 1}), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [rows] = await db.execute("SELECT * FROM notas WHERE id = ?", [id]);
@@ -43,7 +59,6 @@ app.get("/:id", param("id").isInt({min: 1}), verificarValidaciones, async (req, 
   res.json({ success: true, data: rows[0] });
 });
 
-// POST /notas - Crear una nueva nota
 app.post("/",
   body("alumno_id").isInt({ min: 1 }),
   body("materia_id").isInt({ min: 1 }),
@@ -54,7 +69,6 @@ app.post("/",
   async (req, res) => {
   const { alumno_id, materia_id, nota1, nota2, nota3 } = req.body;
 
-  // Verificar que no exista ya una nota para ese alumno en esa materia
   const [existe] = await db.execute(
     "SELECT * FROM notas WHERE alumno_id = ? AND materia_id = ?",
     [alumno_id, materia_id]
@@ -77,7 +91,6 @@ app.post("/",
   });
 });
 
-// PUT /notas/:id - Actualizar una nota
 app.put(
   "/:id",
   param("id").isInt({ min: 1 }),
@@ -104,7 +117,6 @@ app.put(
   }
 );
 
-// DELETE /notas/:id - Eliminar una nota
 app.delete("/:id", param("id").isInt({min: 1}), verificarValidaciones, async (req, res) => {
   const { id } = req.params;
   const [result] = await db.execute("DELETE FROM notas WHERE id = ?", [id]);

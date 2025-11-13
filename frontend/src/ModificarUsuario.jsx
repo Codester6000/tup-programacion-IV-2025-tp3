@@ -17,7 +17,11 @@ export const ModificarUsuario = () => {
       console.log("Error al consultar por usuario:", data.error);
       return;
     }
-    setValues(data.usuario);
+    setValues({
+      nombre: data.data.nombre,
+      email: data.data.email,
+      password: "",
+    });
   }, [fetchAuth, id]);
 
   useEffect(() => {
@@ -26,12 +30,19 @@ export const ModificarUsuario = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(values);
+    
+    const bodyToSend = {
+      nombre: values.nombre,
+      email: values.email,
+    };
+    if (values.password) {
+      bodyToSend.password = values.password;
+    }
 
     const response = await fetchAuth(`http://localhost:3000/usuarios/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify(bodyToSend),
     });
 
     const data = await response.json();
@@ -43,8 +54,8 @@ export const ModificarUsuario = () => {
     navigate("/usuarios");
   };
 
-  if (!values) {
-    return null;
+  if (!values || !values.nombre) {
+    return <article aria-busy="true">Cargando datos del usuario...</article>;
   }
 
   return (
@@ -53,22 +64,34 @@ export const ModificarUsuario = () => {
       <form onSubmit={handleSubmit}>
         <fieldset>
           <label>
-            Nombre de usuario
-            <input
-              required
-              value={values.username}
-              onChange={(e) =>
-                setValues({ ...values, username: e.target.value })
-              }
-            />
-          </label>
-          <label>
             Nombre
             <input
               required
               value={values.nombre}
               onChange={(e) => setValues({ ...values, nombre: e.target.value })}
             />
+          </label>
+          <label>
+            Email
+            <input
+              required
+              type="email"
+              value={values.email}
+              onChange={(e) => setValues({ ...values, email: e.target.value })}
+            />
+          </label>
+          <label>
+            Nueva Contraseña (dejar vacío para no cambiar)
+            <input
+              type="password"
+              value={values.password}
+              onChange={(e) => setValues({ ...values, password: e.target.value })}
+              autoComplete="new-password"
+              placeholder="********"
+            />
+            <small>
+              Debe tener al menos 8 caracteres, una letra y un número.
+            </small>
           </label>
         </fieldset>
         <input type="submit" value="Modificar usuario" />

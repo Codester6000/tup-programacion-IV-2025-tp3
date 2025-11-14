@@ -1,6 +1,7 @@
-:root {
-  --pico-font-size: 90%;
-  --pico-line-height: 1.4;
-  --pico-form-element-spacing-vertical: 0.75rem;
-  --pico-form-element-spacing-horizontal: 1rem;
+button > svg, [role="button"] > svg {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  margin-top: -2px;
 }

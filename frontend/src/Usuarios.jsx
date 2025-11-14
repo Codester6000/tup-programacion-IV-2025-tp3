@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "./Auth";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
+import { UserPlus, Search, Edit, Trash2 } from "lucide-react";
 
 export function Usuarios() {
   const { fetchAuth } = useAuth();
@@ -56,11 +57,11 @@ export function Usuarios() {
     <article>
       <h2>Usuarios</h2>
       <Link role="button" to="/usuarios/crear">
-        Nuevo usuario
+        <UserPlus /> Nuevo usuario
       </Link>
       <div className="group">
         <input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar por nombre o email..." />
-        <button onClick={() => fetchUsuarios(buscar)}>Buscar</button>
+        <button onClick={() => fetchUsuarios(buscar)}><Search /> Buscar</button>
       </div>
       <table>
         <thead>
@@ -79,10 +80,10 @@ export function Usuarios() {
               <td>{u.email}</td>
               <td>
                 <div>
-                  <Link role="button" to={`/usuarios/${u.id}/modificar`}>
-                    Modificar
+                  <Link role="button" to={`/usuarios/${u.id}/modificar`} className="outline">
+                    <Edit /> Modificar
                   </Link>
-                  <button onClick={() => handleQuitar(u.id)}>Quitar</button>
+                  <button className="secondary" onClick={() => handleQuitar(u.id)}><Trash2 /> Quitar</button>
                 </div>
               </td>
             </tr>

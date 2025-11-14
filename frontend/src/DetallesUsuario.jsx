@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./Auth";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { Edit, Trash2 } from "lucide-react";
 
 export const DetallesUsuario = () => {
   const { fetchAuth } = useAuth();
@@ -56,10 +57,10 @@ export const DetallesUsuario = () => {
       </p>
       <div className="grid">
         <Link role="button" to={`/usuarios/${id}/modificar`}>
-          Modificar
+          <Edit /> Modificar
         </Link>
         <button className="secondary" onClick={handleQuitar}>
-          Quitar
+          <Trash2 /> Quitar
         </button>
       </div>
     </article>

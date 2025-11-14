@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./Auth";
 import { Link } from "react-router-dom";
+import { UserPlus, Edit, Trash2 } from "lucide-react";
 
 export function Alumnos() {
   const { fetchAuth } = useAuth();
@@ -52,14 +53,9 @@ export function Alumnos() {
     <article>
       <h2>Gestión de Alumnos</h2>
       <Link role="button" to="/alumnos/crear">
-        Nuevo Alumno
+        <UserPlus /> Nuevo Alumno
       </Link>
-      <input
-        value={buscar}
-        onChange={(e) => setBuscar(e.target.value)}
-        placeholder="Buscar por nombre, apellido o DNI..."
-        style={{ marginTop: '1rem' }}
-      />
+      <input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar por nombre, apellido o DNI..." style={{ marginTop: '1rem' }} />
       <button onClick={() => setMostrarAlumnos(!mostrarAlumnos)} className="contrast" style={{ marginBottom: '1rem' }}>
         {mostrarAlumnos ? "Ocultar Lista" : "Mostrar Lista"}
       </button>
@@ -83,8 +79,8 @@ export function Alumnos() {
                 <td>{a.apellido}</td>
                 <td>{a.dni}</td>
                 <td>
-                  <Link role="button" to={`/alumnos/${a.id}/modificar`}>Modificar</Link>
-                  <button className="secondary" onClick={() => handleQuitar(a.id)}>Quitar</button>
+                  <Link role="button" to={`/alumnos/${a.id}/modificar`}><Edit /> Modificar</Link>
+                  <button className="secondary" onClick={() => handleQuitar(a.id)}><Trash2 /> Quitar</button>
                 </td>
               </tr>
             ))}

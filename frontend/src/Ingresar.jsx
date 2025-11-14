@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "./Auth";
 import { Link } from "react-router-dom";
+import { LogIn, UserPlus, X } from "lucide-react";
 
 export const Ingresar = () => {
   const { error, login } = useAuth();
@@ -16,38 +17,24 @@ export const Ingresar = () => {
 
   return (
     <>
-      <button onClick={() => setOpen(true)}>Ingresar</button>
+      <button onClick={() => setOpen(true)}><LogIn /> Ingresar</button>
       <dialog open={open}>
         <article>
           <h2>Ingrese usuario y contraseña</h2>
           <form onSubmit={handleSubmit}>
             <fieldset>
               <label htmlFor="email">Email:</label>
-              <input
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <input name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               <label htmlFor="password">Contraseña:</label>
-              <input
-                name="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <input name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               {error && <p style={{ color: "red" }}>{error}</p>}
             </fieldset>
             <footer>
               <div className="grid">
-                <input
-                  type="button"
-                  className="secondary"
-                  value="Cancelar"
-                  onClick={() => setOpen(false)}
-                />
-                <input type="submit" value="Ingresar" />
+                <button type="button" className="secondary" onClick={() => setOpen(false)}><X /> Cancelar</button>
+                <button type="submit"><LogIn /> Ingresar</button>
                 <Link to="/usuarios/crear" role="button" className="contrast" onClick={() => setOpen(false)}>
-                  Registrarse
+                  <UserPlus /> Registrarse
                 </Link>
               </div>
             </footer>

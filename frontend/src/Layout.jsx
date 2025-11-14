@@ -1,6 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "./Auth";
 import { Ingresar } from "./Ingresar";
+import { GraduationCap, Book, ClipboardList, Users, LogOut } from "lucide-react";
 
 export const Layout = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -10,24 +11,20 @@ export const Layout = () => {
       <nav>
         <ul>
           <li>
-            <Link to="/alumnos">Alumnos</Link>
+            <Link to="/alumnos"><GraduationCap /> Alumnos</Link>
           </li>
           <li>
-            <Link to="/materias">Materias</Link>
+            <Link to="/materias"><Book /> Materias</Link>
           </li>
           <li>
-            <Link to="/">Notas</Link>
+            <Link to="/"><ClipboardList /> Notas</Link>
           </li>
           <li>
-            <Link to="/usuarios">Usuarios</Link>
+            <Link to="/usuarios"><Users /> Usuarios</Link>
           </li>
         </ul>
         <li>
-          {isAuthenticated ? (
-            <button onClick={() => logout()}>Salir</button>
-          ) : (
-            <Ingresar />
-          )}
+          {isAuthenticated ? <button onClick={() => logout()}><LogOut /> Salir</button> : <Ingresar />}
         </li>
       </nav>
       <Outlet />

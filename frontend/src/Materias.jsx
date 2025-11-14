@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "./Auth";
 import { Link } from "react-router-dom";
+import { BookPlus, Edit, Trash2 } from "lucide-react";
 
 export function Materias() {
   const { fetchAuth } = useAuth();
@@ -52,14 +53,9 @@ export function Materias() {
     <article>
       <h2>Gestión de Materias</h2>
       <Link role="button" to="/materias/crear">
-        Nueva Materia
+        <BookPlus /> Nueva Materia
       </Link>
-      <input
-        value={buscar}
-        onChange={(e) => setBuscar(e.target.value)}
-        placeholder="Buscar por nombre o código..."
-        style={{ marginTop: '1rem' }}
-      />
+      <input value={buscar} onChange={(e) => setBuscar(e.target.value)} placeholder="Buscar por nombre o código..." style={{ marginTop: '1rem' }} />
       <button onClick={() => setMostrarMaterias(!mostrarMaterias)} className="contrast" style={{ marginBottom: '1rem' }}>
         {mostrarMaterias ? "Ocultar Lista" : "Mostrar Lista"}
       </button>
@@ -83,8 +79,8 @@ export function Materias() {
                 <td>{m.codigo}</td>
                 <td>{m.año}</td>
                 <td>
-                  <Link role="button" to={`/materias/${m.id_materia}/modificar`}>Modificar</Link>
-                  <button className="secondary" onClick={() => handleQuitar(m.id_materia)}>Quitar</button>
+                  <Link role="button" to={`/materias/${m.id_materia}/modificar`}><Edit /> Modificar</Link>
+                  <button className="secondary" onClick={() => handleQuitar(m.id_materia)}><Trash2 /> Quitar</button>
                 </td>
               </tr>
             ))}

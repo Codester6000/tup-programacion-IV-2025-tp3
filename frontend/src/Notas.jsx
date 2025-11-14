@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./Auth";
+import { Plus, Edit, Trash2, Save, X } from "lucide-react";
 
 export function Notas() {
   const { fetchAuth } = useAuth();
@@ -184,7 +185,7 @@ export function Notas() {
           <input type="number" step="0.01" value={newNota.nota2} onChange={(e) => setNewNota({ ...newNota, nota2: e.target.value })} placeholder="Nota 2" />
           <input type="number" step="0.01" value={newNota.nota3} onChange={(e) => setNewNota({ ...newNota, nota3: e.target.value })} placeholder="Nota 3" />
         </div>
-        <button type="submit">Agregar Nota</button>
+        <button type="submit"><Plus /> Agregar Nota</button>
       </form>
 
       <button onClick={() => setMostrarNotas(!mostrarNotas)} className="contrast" style={{ marginTop: '1rem' }}>
@@ -197,16 +198,8 @@ export function Notas() {
 
           <h3>Buscar Notas</h3>
           <div className="grid">
-            <input
-              value={buscarAlumno}
-              onChange={(e) => setBuscarAlumno(e.target.value)}
-              placeholder="Buscar por alumno..."
-            />
-            <input
-              value={buscarMateria}
-              onChange={(e) => setBuscarMateria(e.target.value)}
-              placeholder="Buscar por materia..."
-            />
+            <input value={buscarAlumno} onChange={(e) => setBuscarAlumno(e.target.value)} placeholder="Buscar por alumno..." />
+            <input value={buscarMateria} onChange={(e) => setBuscarMateria(e.target.value)} placeholder="Buscar por materia..." />
           </div>
 
           <table>
@@ -233,8 +226,8 @@ export function Notas() {
                   <td>{nota.nota3 ?? "-"}</td>
                   <td>{nota.promedio ?? "-"}</td>
                   <td>
-                    <button onClick={() => setEditingNota(nota)}>Editar</button>
-                    <button className="secondary" onClick={() => handleEliminarNota(nota.id)}>Eliminar</button>
+                    <button onClick={() => setEditingNota(nota)}><Edit /> Editar</button>
+                    <button className="secondary" onClick={() => handleEliminarNota(nota.id)}><Trash2 /> Eliminar</button>
                   </td>
                 </tr>
               ))}
@@ -253,8 +246,8 @@ export function Notas() {
                   <label>Nota 3</label>
                   <input type="number" step="0.01" value={editingNota.nota3 ?? ""} onChange={(e) => setEditingNota({ ...editingNota, nota3: e.target.value })} />
                   <footer>
-                    <button type="button" className="secondary" onClick={() => setEditingNota(null)}>Cancelar</button>
-                    <button type="submit">Guardar Cambios</button>
+                    <button type="button" className="secondary" onClick={() => setEditingNota(null)}><X /> Cancelar</button>
+                    <button type="submit"><Save /> Guardar Cambios</button>
                   </footer>
                 </form>
               </article>
